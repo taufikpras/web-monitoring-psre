@@ -1,0 +1,180 @@
+services:
+  api:
+    build: ./api
+    container_name: monitoring-api
+    restart: always
+    command: fastapi dev /api/src/app.py --port 80 --host 0.0.0.0
+    ports:
+      - 8080:80
+      # - 5678:5678
+    volumes:
+      - ./api/src:/api/src
+      - api-data:/api/data
+      - api-input:/api/input
+      - api-tmp:/api/tmp
+      - api-logs:/api/logs:rw
+    environment:
+      NODE_NAME: ${NODE_NAME}.API
+      TZ: ${TZ}
+      CELERY_ENABLE_UTC: False
+      INFLUX_BUCKET: ${INFLUX_BUCKET}
+      INFLUX_URL: http://${INFLUX_URL}:${INFLUX_PORT}
+      INFLUX_ORG: ${INFLUX_ORG}
+      INFLUX_TOKEN: ${INFLUX_TOKEN}
+      TIME_INTERVAL: ${TIME_INTERVAL}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID} 
+      SEND_NOTIF: 1
+    depends_on:
+      - mongo
+      - influxdb
+      - redis
+
+  app:
+    build:
+      context: ./app
+    container_name: monitoring-app
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      - API_BASE_URL=${API_BASE_URL:-/api}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - api
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    ports:
+      - ${MONGO_PORT}:${MONGO_PORT}
+    volumes:
+      - mongodb:/data/db
+      - mongoconfig:/data/configdb
+    environment:
+      TZ: ${TZ}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+
+  influxdb:
+    image: influxdb:2.0
+    container_name: influxdb
+    restart: always
+    ports:
+      - 8086:8086
+    volumes:
+      - influxdata:/var/lib/influxdb2
+      - influxconfig:/etc/influxdb2
+    environment:
+      TZ: ${TZ}
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${DOCKER_INFLUXDB_INIT_USERNAME}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${DOCKER_INFLUXDB_INIT_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUX_ORG}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUX_BUCKET}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUX_TOKEN}
+
+  celery_worker1:
+    container_name: ${NODE_NAME}.WORKER.1
+    restart: always
+    build: ./api
+    command: celery -A src.celery worker -n ${NODE_NAME}.WORKER.1 --concurrency=3 --pool=prefork --loglevel=${WORKER_LOG_LEVEL}
+    volumes:
+      - ./api/src:/api/src
+    environment:
+      NODE_NAME: ${NODE_NAME}.WORKER.1
+      TZ: ${TZ}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID} 
+      INFLUX_BUCKET: ${INFLUX_BUCKET}
+      INFLUX_URL: http://${INFLUX_URL}:${INFLUX_PORT}
+      INFLUX_ORG: ${INFLUX_ORG}
+      INFLUX_TOKEN: ${INFLUX_TOKEN}
+      SEND_NOTIF: ${SEND_NOTIF}
+    depends_on:
+      - redis
+      - influxdb
+      - api
+
+  celery_worker2:
+    container_name: ${NODE_NAME}.WORKER.2
+    restart: always
+    build: ./api
+    command: celery -A src.celery worker -n ${NODE_NAME}.WORKER.2 --concurrency=3 --pool=prefork --loglevel=${WORKER_LOG_LEVEL}
+    volumes:
+      - ./api/src:/api/src
+    environment:
+      NODE_NAME: ${NODE_NAME}.WORKER.2
+      TZ: ${TZ}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID} 
+      INFLUX_BUCKET: ${INFLUX_BUCKET}
+      INFLUX_URL: http://${INFLUX_URL}:${INFLUX_PORT}
+      INFLUX_ORG: ${INFLUX_ORG}
+      INFLUX_TOKEN: ${INFLUX_TOKEN}
+      SEND_NOTIF: ${SEND_NOTIF}
+    depends_on:
+      - redis
+      - influxdb
+      - api
+
+  flower:
+    container_name: flower
+    restart: always
+    build: ./api
+    command: celery -A src.celery flower --broker=redis://${REDIS_URL}:{REDIS_PORT}/0 --port=5555
+    environment:
+      TZ: "Asia/Jakarta"
+    ports:
+      - 5556:5555
+    depends_on:
+      - app
+      - redis
+      - celery_worker1
+      - celery_worker2
+
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      TZ: "Asia/Jakarta"
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_URL}:${MONGO_PORT}/
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - influxdb
+      - app
+    volumes:
+      - grafana:/var/lib/grafana
+
+volumes:
+  mongodb:
+  mongoconfig:
+  grafana:
+  influxdata:
+  influxconfig:
+  api-data:
+  api-input:
+  api-tmp:
+  api-logs:
