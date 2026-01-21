@@ -17,3 +17,6 @@ celery[redis]
 flower
 fastapi_utils
 typing_inspect
+passlib[bcrypt]
+argon2-cffi
+python-jose[cryptography]

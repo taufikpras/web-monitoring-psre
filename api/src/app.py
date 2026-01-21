@@ -10,6 +10,7 @@ from src.route.report_route import router as report_router
 from src.route.file_route import router as file_router
 from src.route.stat_route import router as stat_router
 from src.route.ticket_route import router as ticket_router
+from src.route.user_route import router as user_router
 import src.core.ticket_core as ticket_core
 import src.logging as logging_
 from src import parameters as params
@@ -41,6 +42,7 @@ app.include_router(test_router)
 app.include_router(file_router)
 app.include_router(stat_router)
 app.include_router(ticket_router)
+app.include_router(user_router)
 app.version = params.API_VERSION
 app.title = "API Monitoring PSRE"
 
