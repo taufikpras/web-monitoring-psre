@@ -1,23 +1,23 @@
 # Web Monitoring PSRE
 
-Sistem monitoring untuk Electronic Certification Authorities (PSRE) yang memantau ketersediaan VA (CA, CRL, OCSP), mengelola repositori sertifikat, dan sistem ticketing otomatis untuk masalah ketersediaan.
+Monitoring system for Electronic Certification Authorities (PSRE) that monitors VA availability (CA, CRL, OCSP), manages certificate repositories, and features an automated ticketing system for availability issues.
 
-## 🚀 Fitur Utama
+## 🚀 Key Features
 
-- **Dashboard Real-time**: Visualisasi ketersediaan VA (CRL & OCSP) dengan indikator warna (Red <70%, Yellow 71-80%, Green >80%).
-- **File Repository**: Pemisahan otomatis antara Sertifikat CA dan Non-CA dengan filter yang dinamis.
-- **Data Manager**: Pengelolaan data input untuk monitoring.
-- **Ticketing System**: Deteksi masalah otomatis dan pembuatan tiket (Open/Closed) dengan jumlah kemunculan.
-- **Auto Cleanup**: Pembersihan otomatis tiket yang sudah selesai (Closed) lebih dari 90 hari.
-- **Docker Ready**: Build script otomatis dengan versioning dan push ke Docker Hub.
-- **Runtime Configuration**: Konfigurasi API URL pada frontend tanpa perlu rebuild Docker image.
+- **Real-time Dashboard**: Visualization of VA availability (CRL & OCSP) with color indicators (Red <70%, Yellow 71-80%, Green >80%).
+- **File Repository**: Automatic separation of CA and Non-CA certificates with dynamic filters.
+- **Data Manager**: Management of input data for monitoring.
+- **Ticketing System**: Automatic issue detection and ticket creation (Open/Closed) with occurrence counts.
+- **Auto Cleanup**: Automatic cleanup of completed (Closed) tickets older than 90 days.
+- **Docker Ready**: Automated build scripts with versioning and pushing to Docker Hub.
+- **Runtime Configuration**: API URL configuration on the frontend without needing to rebuild the Docker image.
 
 ## 🛠️ Tech Stack
 
 ### Backend (API)
 - **Framework**: FastAPI (Python 3.11)
-- **Database**: MongoDB (untuk data persisten) & InfluxDB (untuk data time-series/statistik)
-- **Task Queue**: Celery with Redis (untuk monitoring berkala)
+- **Database**: MongoDB (for persistent data) & InfluxDB (for time-series/statistics data)
+- **Task Queue**: Celery with Redis (for periodic monitoring)
 - **Scheduler**: APScheduler
 - **Validation**: Pydantic
 
@@ -28,7 +28,7 @@ Sistem monitoring untuk Electronic Certification Authorities (PSRE) yang memanta
 - **Routing**: React Router 7
 - **Charts**: Recharts
 
-## 📁 Struktur Proyek
+## 📁 Project Structure
 
 ```text
 web-monitoring-psre/
@@ -45,14 +45,14 @@ web-monitoring-psre/
 └── docker-compose.yml  # Orchestration services
 ```
 
-## 🏗️ Cara Menjalankan
+## 🏗️ How to Run
 
-### Menggunakan Docker (Rekomendasi)
+### Using Docker (Recommended)
 
-1. **Persiapan Environtment**:
-   Duplicate file `.env.example` (jika ada) ke `.env` dan isi variabelnya.
+1. **Environment Setup**:
+   Duplicate the `.env.example` file (if available) to `.env` and fill in the variables.
 
-2. **Jalankan dengan Docker Compose**:
+2. **Run with Docker Compose**:
    ```bash
    docker-compose up -d --build
    ```
@@ -60,7 +60,7 @@ web-monitoring-psre/
    - Frontend: `http://localhost` (Port 80)
    - API: `http://localhost:8080/api` (Port 8080)
 
-### Development (Lokal)
+### Development (Local)
 
 #### Backend
 ```bash
@@ -78,24 +78,24 @@ npm run dev
 
 ## 🐋 Docker Build & Tagging
 
-Gunakan script `build.sh` untuk melakukan build, tagging versi otomatis (`YYYYMMDD.XXXX`), dan push ke Docker Hub:
+Use the `build.sh` script to build, auto-tag versions (`YYYYMMDD.XXXX`), and push to Docker Hub:
 
 ```bash
 chmod +x build.sh
 ./build.sh
 ```
 
-Script ini akan:
-1. Menghasilkan versi unik berdasarkan tanggal dan random hex.
-2. Melakukan build untuk API dan App.
-3. Memberikan tag versi dan `latest`.
-4. Melakukan push ke Docker Hub (`taufikp/monitoring-psre-*`).
+This script will:
+1. Generate a unique version based on date and random hex.
+2. Build the API and App.
+3. Assign version and `latest` tags.
+4. Push to Docker Hub (`taufikp/monitoring-psre-*`).
 
-## ⚙️ Konfigurasi Runtime
+## ⚙️ Runtime Configuration
 
-Frontend mendukung injeksi API URL secara dinamis saat container dijalankan menggunakan environment variable `API_BASE_URL`.
+The frontend supports dynamic API URL injection when the container is run, using the `API_BASE_URL` environment variable.
 
-**Contoh di docker-compose:**
+**Example in docker-compose:**
 ```yaml
 app:
   environment:
@@ -104,16 +104,16 @@ app:
 
 ## 🧹 Ticket Cleanup
 
-Ticketing system memiliki fitur pembersihan otomatis:
-- **Jadwal**: Setiap hari pukul 08:00 AM.
-- **Kondisi**: Hanya tiket berstatus **Closed** yang sudah berumur > 90 hari.
-- **Trigger Manual**: `POST /api/tickets/cleanup?days=90`
+The ticketing system has an automated cleanup feature:
+- **Schedule**: Every day at 08:00 AM.
+- **Condition**: Only tickets with a **Closed** status that are > 90 days old.
+- **Manual Trigger**: `POST /api/tickets/cleanup?days=90`
 
-## 🏷️ Versi
+## 🏷️ Versioning
 
-Versi aplikasi ditampilkan di bagian bawah sidebar.
-- **Frontend Version**: Disuntikkan saat build (`app/version.txt`).
-- **API Version**: Diambil secara dinamis dari file versi di folder `api/`.
+The application version is displayed at the bottom of the sidebar.
+- **Frontend Version**: Injected during build (`app/version.txt`).
+- **API Version**: Fetched dynamically from the version file in the `api/` folder.
 
 ---
-Build with ❤️ by Taufik
+Built with ❤️ by Taufik
