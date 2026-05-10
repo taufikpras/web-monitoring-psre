@@ -11,6 +11,7 @@ from src.route.file_route import router as file_router
 from src.route.stat_route import router as stat_router
 from src.route.ticket_route import router as ticket_router
 from src.route.user_route import router as user_router
+from src.route.agent_route import router as agent_router
 import src.core.ticket_core as ticket_core
 import src.logging as logging_
 from src import parameters as params
@@ -43,6 +44,7 @@ app.include_router(file_router)
 app.include_router(stat_router)
 app.include_router(ticket_router)
 app.include_router(user_router)
+app.include_router(agent_router)
 app.version = params.API_VERSION
 app.title = "API Monitoring PSRE"
 
@@ -52,10 +54,10 @@ async def repeated_task():
     celery.create_periodic_verification()
     logger.info("Done executing verification task")
     
-    logger.info("Send Notfication Task")
-    num = celery.verifier_notification()
-    logger.info(f"{num} Notifications found")
-    logger.info("Done Sending Notfication Task")
+    # logger.info("Send Notfication Task")
+    # num = celery.verifier_notification()
+    # logger.info(f"{num} Notifications found")
+    # logger.info("Done Sending Notfication Task")
 
 @repeat_every(seconds=60 * 60)  # 24 hours
 async def periodic_report():

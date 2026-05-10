@@ -142,13 +142,14 @@ export function TicketsPage() {
                             {activeTab === 'closed' && (
                                 <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text-secondary)' }}>End Date</th>
                             )}
+                            <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text-secondary)' }}>Last Notif</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan={activeTab === 'closed' ? 5 : 4} style={{ padding: '2rem', textAlign: 'center' }}>Loading tickets...</td></tr>
+                            <tr><td colSpan={activeTab === 'closed' ? 6 : 5} style={{ padding: '2rem', textAlign: 'center' }}>Loading tickets...</td></tr>
                         ) : currentTickets.length === 0 ? (
-                            <tr><td colSpan={activeTab === 'closed' ? 5 : 4} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No tickets found</td></tr>
+                            <tr><td colSpan={activeTab === 'closed' ? 6 : 5} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No tickets found</td></tr>
                         ) : (
                             currentTickets.map((ticket: Ticket) => (
                                 <tr key={ticket.ticket_id} style={{ borderBottom: '1px solid var(--border-color)' }}>
@@ -188,6 +189,9 @@ export function TicketsPage() {
                                             {ticket.end ? new Date(ticket.end).toLocaleString() : '-'}
                                         </td>
                                     )}
+                                    <td style={{ padding: '1rem', verticalAlign: 'top', fontSize: '0.875rem' }}>
+                                        {ticket.last_notif ? new Date(ticket.last_notif).toLocaleString() : '-'}
+                                    </td>
                                 </tr>
                             ))
                         )}

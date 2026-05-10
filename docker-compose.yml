@@ -47,6 +47,8 @@ services:
   redis:
     image: redis
     container_name: redis
+    environment:
+      TZ: ${TZ}
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
 
@@ -132,7 +134,7 @@ services:
     build: ./api
     command: celery -A src.celery flower --broker=redis://${REDIS_URL}:{REDIS_PORT}/0 --port=5555
     environment:
-      TZ: "Asia/Jakarta"
+      TZ: ${TZ}
     ports:
       - 5556:5555
     depends_on:

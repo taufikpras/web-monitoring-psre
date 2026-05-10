@@ -16,6 +16,7 @@ celery_app = Celery('tasks', broker=f'redis://:{parameters.REDIS_PASSWORD}@{para
 celery_app.conf['CELERY_ENABLE_UTC'] = False
 celery_app.conf['timezone'] = parameters.TZ
 celery_app.conf.result_expires = 60 * 3  # Expire results after 1 day (in seconds)
+celery_app.conf.result_extended = True
 @celery_app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     # Calls test('hello') every 10 seconds.
@@ -59,7 +60,8 @@ def ocsp_verifier(queue: dict):
 @celery_app.task()
 def send_notification(notif: dict):
     notif_obj = Tickets_Schema.model_validate(notif)
-    msg = telegram_util.send_ticket_notification(notif_obj)
+    # msg = telegram_util.send_ticket_notification(notif_obj)
+    msg = ""
     ticket_core.update_last_notif(notif_obj)
     
     return msg

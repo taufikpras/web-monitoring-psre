@@ -15,7 +15,25 @@ export const authService = {
         localStorage.removeItem('token');
         localStorage.removeItem('role');
     },
-    isAuthenticated: () => !!localStorage.getItem('token'),
+    isTokenExpired: () => {
+        const token = localStorage.getItem('token');
+        if (!token) return true;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp && payload.exp * 1000 < Date.now();
+        } catch (e) {
+            return true;
+        }
+    },
+    isAuthenticated: () => {
+        const token = localStorage.getItem('token');
+        if (!token) return false;
+        if (authService.isTokenExpired()) {
+            authService.logout();
+            return false;
+        }
+        return true;
+    },
     isAdmin: () => localStorage.getItem('role') === 'admin',
 
     checkSetup: async () => {

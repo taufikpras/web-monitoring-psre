@@ -33,7 +33,7 @@ TELEGRAM_BOT_TOKEN = check_param("TELEGRAM_BOT_TOKEN","")
 TELEGRAM_CHAT_ID = check_param("TELEGRAM_CHAT_ID","")
 NODE_NAME = check_param("NODE_NAME","")
 SEND_NOTIF = check_param("SEND_NOTIF","1")
-TIME_INTERVAL = int(check_param("TIME_INTERVAL","180"))
+TIME_INTERVAL = int(check_param("TIME_INTERVAL","300"))
 
 # read from file
 API_VERSION = "0.0.1"

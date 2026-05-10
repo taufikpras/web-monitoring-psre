@@ -12,7 +12,7 @@ RUN mkdir -p /api/logs
 
 ENV TZ="Asia/Jakarta"
 
-COPY ./versions /api/versions
+COPY ./version.txt /api/version.txt
 
 COPY ./requirements.txt /api/requirements.txt
 

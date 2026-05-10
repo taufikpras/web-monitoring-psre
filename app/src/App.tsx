@@ -5,6 +5,7 @@ import { DataList } from './pages/DataList';
 import { UploadPage } from './pages/UploadPage';
 import { TicketsPage } from './pages/TicketsPage';
 import { FilesPage } from './pages/FilesPage';
+import { AgentPage } from './pages/AgentPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AdminSetupPage from './pages/AdminSetupPage';
@@ -77,6 +78,7 @@ function App() {
           <Route path="/files" element={<ProtectedRoute><FilesPage /></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
           <Route path="/tickets" element={<ProtectedRoute><TicketsPage /></ProtectedRoute>} />
+          <Route path="/agent" element={<ProtectedRoute><AgentPage /></ProtectedRoute>} />
 
           {/* Admin Only Routes */}
           <Route path="/users" element={<ProtectedRoute adminOnly><UserManagementPage /></ProtectedRoute>} />

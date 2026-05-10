@@ -1,4 +1,4 @@
-import { LayoutDashboard, Upload, Database, AlertTriangle, FileText, Users, LogOut } from 'lucide-react';
+import { LayoutDashboard, Upload, Database, AlertTriangle, FileText, Users, LogOut, Activity } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
@@ -18,6 +18,7 @@ export function Sidebar() {
         { to: '/files', icon: FileText, label: 'File Repository' },
         { to: '/upload', icon: Upload, label: 'Upload Certificate' },
         { to: '/tickets', icon: AlertTriangle, label: 'Tickets' },
+        { to: '/agent', icon: Activity, label: 'Background Agent' },
     ];
 
     if (isAdmin) {
